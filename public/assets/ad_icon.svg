@@ -7,17 +7,17 @@
 	.st1{fill:#F26052;}
 </style>
 <g id="XMLID_17_">
-	<rect id="XMLID_595_" x="47.922" y="63.798" className="st0" width="184.155" height="125.155"/>
-	<rect id="XMLID_594_" x="38.885" y="31.031" className="st1" width="202.231" height="32.766"/>
+	<rect id="XMLID_595_" x="47.922" y="63.798" class="st0" width="184.155" height="125.155"/>
+	<rect id="XMLID_594_" x="38.885" y="31.031" class="st1" width="202.231" height="32.766"/>
 	<g id="XMLID_106_">
-		<rect id="XMLID_593_" x="65.253" y="17.682" className="st0" width="32.861" height="26.699"/>
+		<rect id="XMLID_593_" x="65.253" y="17.682" class="st0" width="32.861" height="26.699"/>
 	</g>
 	<g id="XMLID_98_">
-		<rect id="XMLID_591_" x="181.885" y="17.682" className="st0" width="32.861" height="26.699"/>
+		<rect id="XMLID_591_" x="181.885" y="17.682" class="st0" width="32.861" height="26.699"/>
 	</g>
-	<rect id="XMLID_491_" x="82.189" y="83.903" className="st1" width="115.621" height="79.794"/>
-	<rect id="XMLID_490_" x="123.569" y="17.682" className="st0" width="32.861" height="26.699"/>
-	<rect id="XMLID_489_" x="127.283" y="188.952" className="st1" width="25.434" height="73.365"/>
+	<rect id="XMLID_491_" x="82.189" y="83.903" class="st1" width="115.621" height="79.794"/>
+	<rect id="XMLID_490_" x="123.569" y="17.682" class="st0" width="32.861" height="26.699"/>
+	<rect id="XMLID_489_" x="127.283" y="188.952" class="st1" width="25.434" height="73.365"/>
 	<g id="XMLID_18_">
 		<path id="XMLID_62_" d="M82.189,166.379h115.621c1.482,0,2.683-1.201,2.683-2.682V83.903c0-1.481-1.201-2.682-2.683-2.682H82.189
 			c-1.482,0-2.683,1.201-2.683,2.682v79.794C79.506,165.178,80.708,166.379,82.189,166.379z M84.873,86.585h110.255v74.43H84.873

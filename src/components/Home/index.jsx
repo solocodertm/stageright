@@ -97,7 +97,7 @@ const HomePage = () => {
             else {
                 dispatch(setCurrentLanguage(res?.data?.data));
             }
-            router.push(availableLanguage.code)
+            router.push(`/locale/${availableLanguage.code}`)
           }
         }
         if(!params?.country && pathname === "/"){
