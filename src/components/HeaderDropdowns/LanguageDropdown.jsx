@@ -18,7 +18,7 @@ const LanguageDropdown = ({ getLanguageData, settings }) => {
             return
         }
         getLanguageData(lang?.code)
-        router.push(`/${lang?.code}`);
+        router.push(`/locale/${lang?.code}`);
     };
     const items = languages && languages.map(lang => ({
         label: (
