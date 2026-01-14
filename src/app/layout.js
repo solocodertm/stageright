@@ -45,6 +45,7 @@ export default async function RootLayout({ children }) {
           name="google-site-verification"
           content="nqSJ5Bfuopq6wMLUO3gg1393BDbTzAnxjr-4LLezT0A"
         />
+        <meta name="msvalidate.01" content="4AEF038F4441BFF56061565C99754DB7" />
       </head>
       <Head>
         <link
