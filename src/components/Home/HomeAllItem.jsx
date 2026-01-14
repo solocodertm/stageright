@@ -10,11 +10,13 @@ import ProductCard from "../Cards/ProductCard.jsx";
 import { getKilometerRange } from "@/redux/reuducer/locationSlice.js";
 import { t } from "@/utils";
 import NoData from "../NoDataFound/NoDataFound";
+import { useCountry } from "@/utils/useCountry";
 
 
 
 const HomeAllItem = ({ cityData, allEmpty }) => {
 
+    const { countryCode } = useCountry();
     const KmRange = useSelector(getKilometerRange)
     const systemSettingsData = useSelector(settingsData)
     const settings = systemSettingsData?.data
@@ -33,6 +35,7 @@ const HomeAllItem = ({ cityData, allEmpty }) => {
         try {
             const params = {
                 page,
+                country: countryCode, // Always include country from URL
             };
             if (!isDemoMode) {
                 if (KmRange > 0) {

@@ -55,6 +55,7 @@ export const MY_REVIEWS = 'my-review'
 export const RENEW_ITEM = 'renew-item'
 export const ADD_REPORT_REVIEW = 'add-review-report'
 export const GET_LOCALE_BY_IP = 'get-locale-by-ip'
+export const SET_COUNTRY = 'set-country'
 
 
 
@@ -581,7 +582,7 @@ export const getMessagesApi = {
 // add item api 
 
 export const addItemApi = {
-    addItem: ({ name, slug, description, category_id, all_category_ids, price, contact, video_link, custom_fields, image, gallery_images = [], address, latitude, longitude, custom_field_files = [], show_only_to_premium, country, state, city, area_id, currency_code } = {}) => {
+    addItem: ({ name, slug, description, category_id, all_category_ids, price, contact, video_link, custom_fields, image, gallery_images = [], address, latitude, longitude, custom_field_files = [], show_only_to_premium, country, state, city, area_id } = {}) => {
         const formData = new FormData();
         // Append only if the value is defined and not an empty string
 
@@ -591,7 +592,6 @@ export const addItemApi = {
         if (category_id) formData.append('category_id', category_id);
         if (all_category_ids) formData.append('all_category_ids', all_category_ids);
         if (price) formData.append('price', price);
-        if (currency_code) formData.append('currency_code', currency_code);
         if (contact) formData.append('contact', contact);
         if (video_link) formData.append('video_link', video_link);
 
@@ -633,7 +633,7 @@ export const addItemApi = {
 
 // Edit item API
 export const editItemApi = {
-    editItem: ({ id, name, slug, description, category_id, all_category_ids, price, contact, video_link, custom_fields, image, gallery_images = [], address, latitude, longitude, custom_field_files = [], show_only_to_premium, country, state, city, area_id, delete_item_image_id,currency_code } = {}) => {
+    editItem: ({ id, name, slug, description, category_id, all_category_ids, price, contact, video_link, custom_fields, image, gallery_images = [], address, latitude, longitude, custom_field_files = [], show_only_to_premium, country, state, city, area_id, delete_item_image_id } = {}) => {
         const formData = new FormData();
         // Append only if the value is defined and not an empty string
         if (id) formData.append('id', id)
@@ -643,7 +643,6 @@ export const editItemApi = {
         if (category_id) formData.append('category_id', category_id);
         if (all_category_ids) formData.append('all_category_ids', all_category_ids);
         if (price) formData.append('price', price);
-        if (currency_code) formData.append('currency_code', currency_code);
         if (delete_item_image_id) formData.append('delete_item_image_id', delete_item_image_id)
         if (contact) formData.append('contact', contact);
         if (video_link) formData.append('video_link', video_link);
@@ -834,10 +833,26 @@ export const getParentCategoriesApi = {
         })
     },
 }
-// get locale by ip
-export const GetLocaleByIpAPI = {
-    GetLocaleByIp: () => {
-        return Api.get(GET_LOCALE_BY_IP)
+
+// GeoIP API - Get locale by IP address
+export const getLocaleByIpApi = {
+    getLocaleByIp: () => {
+        return Api.get(GET_LOCALE_BY_IP, {
+            params: {}
+        })
+    },
+}
+
+// Set country API
+export const setCountryApi = {
+    setCountry: ({ country_code } = {}) => {
+        const formData = new FormData();
+        if (country_code) formData.append('country_code', country_code);
+        return Api.post(SET_COUNTRY, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
     },
 }
 

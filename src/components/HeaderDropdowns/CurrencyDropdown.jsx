@@ -7,23 +7,42 @@ import {
   CurrentCurrencyData,
   setCurrentCurrency,
 } from "@/redux/reuducer/currencySlice";
+import { getAllCountries } from "@/config/countries";
 
 const CurrencyDropdown = ({ settings }) => {
   const CurrentCurrency = useSelector(CurrentCurrencyData);
 
   const currencies = settings && settings?.currencies;
+  const allCountries = getAllCountries();
+  const allowedCurrencyCodes = new Set(
+    allCountries.map((country) => country.currency?.toUpperCase()).filter(Boolean)
+  );
+
+  const filteredCurrencies =
+    currencies &&
+    currencies.filter((currency) =>
+      allowedCurrencyCodes.has(currency.code?.toUpperCase())
+    );
+
+  const effectiveCurrencies =
+    filteredCurrencies && filteredCurrencies.length > 0
+      ? filteredCurrencies
+      : currencies;
   const dispatch = useDispatch();
   const handleLanguageSelect = (prop) => {
-    const lang = currencies?.find((item) => item.id === Number(prop.key));
-    if (CurrentCurrency.id === lang.id) {
+    const selected = effectiveCurrencies?.find(
+      (item) => item.id === Number(prop.key)
+    );
+    if (!selected) return;
+    if (CurrentCurrency.id === selected.id) {
       return;
     }
-    dispatch(setCurrentCurrency(lang));
+    dispatch(setCurrentCurrency(selected));
     window?.location?.reload()
   };
   const items =
-    currencies &&
-    currencies.map((currency) => ({
+    effectiveCurrencies &&
+    effectiveCurrencies.map((currency) => ({
       label: (
         <span className="lang_options">
           <span>{currency?.code?.toLowerCase()}</span>
@@ -43,7 +62,7 @@ const CurrencyDropdown = ({ settings }) => {
       <span className="d-flex align-items-center">
         <span>{CurrentCurrency?.code?.toLowerCase()}</span>
         <span>{CurrentCurrency?.symbol}</span>
-        <span>{currencies?.length > 1 ? <IoMdArrowDropdown /> : <></>}</span>
+        <span>{effectiveCurrencies?.length > 1 ? <IoMdArrowDropdown /> : <></>}</span>
       </span>
     </Dropdown>
   );

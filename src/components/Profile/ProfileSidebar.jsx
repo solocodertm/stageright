@@ -61,10 +61,10 @@ const ProfileSidebar = () => {
             title: `${t('areYouSure')} \u200E`,
             html: `
             <ul>
-                <li className="delete_acc_points">${t('adsAndTransactionWillBeDeleted')}</li>
-                <li className="delete_acc_points">${t('accountsDetailsWillNotRecovered')}</li>
-                <li className="delete_acc_points">${t('subWillBeCancelled')}</li>
-                <li className="delete_acc_points">${t('savedMesgWillBeLost')}</li>
+                <li class="delete_acc_points">${t('adsAndTransactionWillBeDeleted')}</li>
+                <li class="delete_acc_points">${t('accountsDetailsWillNotRecovered')}</li>
+                <li class="delete_acc_points">${t('subWillBeCancelled')}</li>
+                <li class="delete_acc_points">${t('savedMesgWillBeLost')}</li>
             </ul>
         `,
 

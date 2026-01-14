@@ -72,16 +72,15 @@ const Blogs = () => {
 
 
     return (
-        <section className='gradientBg static_pages'>
-            {/* <BreadcrumbComponent title2={t("ourBlogs")} /> */}
+        <section className='static_pages'>
+            <BreadcrumbComponent title2={t("ourBlogs")} />
             <div className='container'>
                 <div className="static_div">
-                    
-                        <h2 >
-                            {/* {t('ourBlogs')} */}
-                            <span>Blogs & </span> <span className="text-second">Latest News</span>.
-                        </h2>
-                    
+                    <div className="main_title">
+                        <span>
+                            {t('ourBlogs')}
+                        </span>
+                    </div>
                     <div className="page_content">
                         <div className="row blog_separator">
                             <div className="col-12 col-md-12 col-lg-9">
