@@ -1,24 +1,21 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { FeaturedSectionApi, getLanguageApi, GetLocaleByIpAPI, sliderApi } from '@/utils/api'
+import { FeaturedSectionApi, sliderApi } from '@/utils/api'
 import { useDispatch, useSelector } from 'react-redux'
 import { SliderData, setSlider } from '@/redux/reuducer/sliderSlice'
-import { CurrentLanguageData, setCurrentLanguage } from '@/redux/reuducer/languageSlice'
+import { CurrentLanguageData } from '@/redux/reuducer/languageSlice'
 import { settingsData } from '@/redux/reuducer/settingSlice'
 import FeaturedSectionsSkeleton from '../Skeleton/FeaturedSectionsSkeleton'
+import SliderSkeleton from '../Skeleton/Sliderskeleton'
+import OfferSlider from './OfferSlider'
 import PopularCategories from './PopularCategories'
 import FeaturedSections from './FeaturedSections'
 import HomeAllItem from './HomeAllItem'
-import { getKilometerRange, saveCity } from '@/redux/reuducer/locationSlice'
-import { useParams, useRouter,usePathname  } from 'next/navigation'
-import toast from 'react-hot-toast'
-import { getCountryLatLng } from '@/utils'
+import { getKilometerRange } from '@/redux/reuducer/locationSlice'
+import SearchComponent from './SearchComponent'
 
 const HomePage = () => {
     const dispatch = useDispatch()
-    const params = useParams()
-    const router = useRouter()
-    const pathname = usePathname()
     const slider = useSelector(SliderData);
     const KmRange = useSelector(getKilometerRange)
     const [IsLoading, setIsLoading] = useState(false)
@@ -50,60 +47,6 @@ const HomePage = () => {
             alt: 'This is the third offer.'
         }
     ];
-
-    useEffect(() => {
-        const getGeoLocation = async () => {
-          const response = await GetLocaleByIpAPI.GetLocaleByIp();
-          const data = response?.data?.data;
-          const countryCode = data?.country_code;
-          let availableLanguage = settings?.languages?.find((l) => l.code === countryCode?.toLowerCase());
-          if(!availableLanguage){
-            const languageCodeMapping = {
-                "AL" : "sq",
-                "AM" : "hy",
-                "BY" : "be",
-                "BA" : "bs",
-                "GR" : "el",
-                "CZ" : "cs",
-                "DK" : "da",
-                "EE" : "et",
-                "GE" : "ka",
-                "KZ" : "kk",
-                "ME" : "cnr",
-                "RS" : "sr",
-                "SE" : "sv",
-                "TJ" : "tg",
-                "TM" : "tk",
-                "UA" : "uk",
-                "PK" : "ps",
-                "SI" : "sk"
-            }
-            const getAppropriateLanguageCode = languageCodeMapping[countryCode] || 'en';
-            availableLanguage = settings?.languages?.find((l) => l.code === getAppropriateLanguageCode);
-          }
-          if(availableLanguage){
-            const res = await getLanguageApi.getLanguage({ language_code: availableLanguage.code, type: 'web' });
-            const setAddressFirstOnIp = localStorage.getItem('set_address_first_on_ip')
-            if(!setAddressFirstOnIp){
-                const cityData = await getCountryLatLng(data.country_name);
-                if(cityData){
-                    saveCity(cityData)
-                    localStorage.setItem('set_address_first_on_ip','true')
-                }
-            }
-            if (res?.data?.error === true) {
-                toast.error(res?.data?.message)
-            }
-            else {
-                dispatch(setCurrentLanguage(res?.data?.data));
-            }
-            router.push(`/locale/${availableLanguage.code}`)
-          }
-        }
-        if(!params?.country && pathname === "/"){
-            getGeoLocation();
-        }
-    },[])
 
     useEffect(() => {
         const fetchSliderData = async () => {
@@ -169,6 +112,7 @@ const HomePage = () => {
 
     return (
         <>
+            {/* {IsLoading ? <SliderSkeleton /> : <OfferSlider sliderData={slider.length > 0 ? slider : dummySliderData} />} */}
             <PopularCategories />
             {IsFeaturedLoading ? <FeaturedSectionsSkeleton /> : <FeaturedSections featuredData={featuredData} setFeaturedData={setFeaturedData} cityData={cityData} allEmpty={allEmpty} />}
             <HomeAllItem cityData={cityData} allEmpty={allEmpty} />

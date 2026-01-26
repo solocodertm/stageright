@@ -27,18 +27,29 @@ const LandingPageHeader = () => {
 
     const getLanguageData = async (language_code = settings?.default_language) => {
         try {
-            const res = await getLanguageApi.getLanguage({ language_code, type: 'web' });
-            if (res?.data?.error === true) {
-                toast.error(res?.data?.message)
-            }
-            else {
+            // Import translation utilities
+            const { loadLanguageTranslations } = await import('@/utils/translations');
+            const { saveLanguageToCookie } = await import('@/utils/cookies');
+            
+            // Load translations (prioritizes static JSON, falls back to API)
+            const languageData = await loadLanguageTranslations(language_code, getLanguageApi);
+            
+            if (languageData) {
+                // Save to cookie AND localStorage (via Redux)
+                saveLanguageToCookie(language_code);
+                
                 if (show) {
                     setShow(false)
                 }
-                dispatch(setCurrentLanguage(res?.data?.data));
+                
+                // Update Redux state (which persists to localStorage)
+                dispatch(setCurrentLanguage(languageData));
+            } else {
+                toast.error('Failed to load language translations');
             }
         } catch (error) {
-            console.log(error)
+            console.error('Error loading language:', error);
+            toast.error('Failed to change language');
         }
     }
 
@@ -46,16 +57,21 @@ const LandingPageHeader = () => {
 
     const setDefaultLanguage = async () => {
         try {
-            const language_code = settings?.default_language
-            const res = await getLanguageApi.getLanguage({ language_code, type: 'web' });
-            if (res?.data?.error === true) {
-                toast.error(res?.data?.message)
-            }
-            else {
-                dispatch(setCurrentLanguage(res?.data?.data));
+            // Check cookie first, then settings default
+            const { getLanguageFromCookie } = await import('@/utils/cookies');
+            const { loadLanguageTranslations } = await import('@/utils/translations');
+            
+            const cookieLanguage = getLanguageFromCookie();
+            const language_code = cookieLanguage || settings?.default_language || 'en';
+            
+            // Load translations (prioritizes static JSON, falls back to API)
+            const languageData = await loadLanguageTranslations(language_code, getLanguageApi);
+            
+            if (languageData) {
+                dispatch(setCurrentLanguage(languageData));
             }
         } catch (error) {
-            console.log(error)
+            console.error('Error setting default language:', error);
         }
     }
 

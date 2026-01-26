@@ -49,7 +49,7 @@ function NewsletterSubscription() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="auth_input"
-          aria-label="Email address for newsletter subscription"
+          ariaLabel="Email address for newsletter subscription"
         />
         <button
           type="submit"

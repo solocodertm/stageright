@@ -22,10 +22,12 @@ import { CatItems, FullTreeData, SingleCurrentPage, SingleLastPage, ViewCategory
 import { getCityData } from "@/redux/reuducer/locationSlice"
 import { CurrentLanguageData } from "@/redux/reuducer/languageSlice"
 import { categorySortBy, setCategorySortBy } from "@/redux/reuducer/filterSlice"
+import { useCountry } from "@/utils/useCountry"
 
 
 const SingleCategory = ({ slug }) => {
 
+    const { countryCode } = useCountry();
     const { lat, long } = useSelector(getCityData)
     const dispatch = useDispatch()
     const BreadcrumbPath = useSelector(BreadcrumbPathData)
@@ -64,7 +66,10 @@ const SingleCategory = ({ slug }) => {
     const getSingleCatItem = async (page) => {
         let data = "";
         try {
-            const params = {page};
+            const params = {
+                page,
+                country: countryCode, // Always include country from URL
+            };
             if(sortBy) params.sort_by = sortBy;
             if (MinMaxPrice?.min_price) params.min_price = MinMaxPrice?.min_price;
             if (MinMaxPrice?.max_price) params.max_price = MinMaxPrice?.max_price;
