@@ -1,312 +1,235 @@
-"use client";
+'use client'
+import BreadcrumbComponent from "@/components/Breadcrumb/BreadcrumbComponent"
+import { CurrentLanguageData } from "@/redux/reuducer/languageSlice"
+import { settingsData } from "@/redux/reuducer/settingSlice"
+import { t, validateForm } from "@/utils"
+import { contactUsApi } from "@/utils/api"
+import { useState } from "react"
+import toast from "react-hot-toast"
+import { FaFacebook, FaInstagram, FaLinkedin, FaPinterest, FaSquareXTwitter } from "react-icons/fa6"
+import { GrLocation } from "react-icons/gr"
+import { RiMailSendLine } from "react-icons/ri"
+import { TbPhoneCall } from "react-icons/tb"
+import { useSelector } from "react-redux"
 
-import QuickAnswerAccordion from "@/components/LandingPage/QuickAnswerAccordion";
-import NoData from "@/components/NoDataFound/NoDataFound";
-import { settingsData } from "@/redux/reuducer/settingSlice";
-import { t, validateForm } from "@/utils";
-import { contactUsApi, getFaqApi } from "@/utils/api";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
+const ContactUs = () => {
 
-export default function ContactUs() {
-  const systemSettingsData = useSelector(settingsData);
-  const [IsLoading, setIsLoading] = useState(false);
-  const [Faq, setFaq] = useState([]);
-  const [faqIsLoading, setFaqIsLoading] = useState(true);
+    const CurrentLanguage = useSelector(CurrentLanguageData)
+    const systemSettingsData = useSelector(settingsData)
+    const settings = systemSettingsData?.data
+    const [IsLoading, setIsLoading] = useState(false)
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+    })
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm(formData)) return;
-    try {
-      setIsLoading(true);
-      const res = await contactUsApi.contactUs(formData);
-      res?.data?.error === false
-        ? toast.success(t("thankForContacting"))
-        : toast.error(t("errorOccurred"));
-      setFormData({ name: "", email: "", subject: "", message: "" });
-    } catch {
-      toast.error(t("errorOccurred"));
-    } finally {
-      setIsLoading(false);
+    const handleInputChange = (e) => {
+        const { name, value } = e.target
+        setFormData(prevState => ({
+            ...prevState,
+            [name]: value
+        }))
     }
-  };
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await getFaqApi.getFaq();
-        setFaq(res?.data?.data || []);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setFaqIsLoading(false);
-      }
-    })();
-  }, []);
+    
 
-  return (
-    <div
-      className="min-vh-100 py-5"
-      style={{
-        background:
-          "linear-gradient(180deg, #ffec8d, rgba(255,255,255,1) 100%)",
-      }}
-    >
-      <div className="container">
-        {/* Header */}
-        <div className="text-center mb-5">
-          <h1 className="display-5 fw-bold hero-font-color">
-            Contact <span className="text-second">Us</span> 
-          </h1>
-          <p className="fs-5 text-muted">
-            Get in touch with us! Whether you have questions, feedback, or need
-            support, we're here to help.
-          </p>
-        </div>
+    const handleSubmit = async (e) => {
+        e.preventDefault()
 
-        {/* Quick Links */}
-        <div className="text-center mb-5">
-          <h4 className="fw-semibold text-dark mb-2">Need Help Fast?</h4>
-          <p className="text-muted">
-            Most questions are answered in our resources:
-          </p>
-          <div className="d-flex flex-wrap gap-3 justify-content-center mt-3">
-            {[
-              ["Help Center", "/report-a-problem"],
-              ["Safety Guidelines", "/safe-trading-guide"],
-              ["Terms of Use", "/pages/terms-and-conditions"],
-              ["Privacy Policy", "/pages/privacy-policy"],
-            ].map(([label, link]) => (
-              <a
-                key={label}
-                href={link}
-                className="text-decoration-none fw-bold text-primary"
-              >
-                {label}
-              </a>
-            ))}
-          </div>
-        </div>
+        if (!validateForm(formData)) {
+            return
+        }
 
-        {/* Contact Section */}
-        <div className="row g-5 align-items-start">
-          {/* Left Info */}
-          <div className="col-lg-6">
-            <h3 className="fw-bold hero-font-color mb-3">Contact Support</h3>
-            <hr />
-            <div className="mb-4">
-              <h5 className="fw-semibold">General Support</h5>
-              <p>Questions, account issues, listings, payments</p>
-              <div className="d-flex flex-wrap align-items-center gap-3">
-                <a href="mailto:support@vidaki.com" className="text-primary">
-                  support@vidaki.com
-                </a>
-                <span className="badge bg-success-subtle text-success fw-semibold">
-                  Response: 24–48 hours
-                </span>
-              </div>
-            </div>
+        try {
+            setIsLoading(true)
+            const res = await contactUsApi.contactUs(formData)
+            if (res?.data?.error === false) {
+                toast.success(t("thankForContacting"))
+            }
+            else {
+                toast.error(t("errorOccurred"))
+            }
 
-            <div className="mb-4">
-              <h5 className="fw-semibold">Safety & Security</h5>
-              <p>Report scams, fraud, or suspicious activity</p>
-              <a href="mailto:safety@vidaki.com" className="text-primary">
-                safety@vidaki.com
-              </a>
-              <div className="mt-2">
-                <span className="badge bg-success-subtle text-success fw-semibold">
-                  Response: Within 24 hours (priority)
-                </span>
-              </div>
-            </div>
+            // Clear form after successful submission
+            setFormData({
+                name: '',
+                email: '',
+                subject: '',
+                message: ''
+            })
+            // You might want to show a success message to the user here
+        } catch (error) {
+            console.log(error)
+            toast.error(t("errorOccurred"))
+            // You might want to show an error message to the user here
+        }
+        finally {
+            setIsLoading(false)
+        }
+    }
+    return (
+        <>
+            <BreadcrumbComponent title2={t('contactUs')} />
+            <div className="container">
+                <div className="row my_prop_title_spacing">
+                    <h4 className="pop_cat_head">{t('contactUs')}</h4>
+                </div>
+                <div className="row">
+                    <div className="col-sm-12">
+                        <div className="contact_us_wrapper">
+                            <form className="contact_us_form" onSubmit={handleSubmit}>
+                                <div className="contact_us_form_header">
+                                    <h5 className="send_us_mesg">{t('sendMessage')}</h5>
+                                    <p className="contact_us_desc">{t('contactIntro')}</p>
+                                </div>
+                                <div className="authrow contact_us_row">
+                                    <div className='auth_in_cont'>
+                                        <label htmlFor="name" className='auth_pers_label'>{t('name')}</label>
+                                        <input
+                                            type="text"
+                                            id='name'
+                                            name='name'
+                                            className='auth_input'
+                                            placeholder={t("enterName")}
+                                            value={formData.name}
+                                            onChange={handleInputChange}
+                                        />
+                                    </div>
+                                    <div className='auth_in_cont'>
+                                        <label htmlFor="email" className='auth_pers_label'>{t('email')}</label>
+                                        <input
+                                            type="email"
+                                            id='email'
+                                            name='email'
+                                            className='auth_input'
+                                            placeholder={t("enterEmail")}
+                                            value={formData.email}
+                                            onChange={handleInputChange}
+                                        />
+                                    </div>
+                                </div>
+                                <div className='auth_in_cont'>
+                                    <label htmlFor="subject" className='auth_pers_label'>{t('subject')}</label>
+                                    <input
+                                        type="text"
+                                        id='subject'
+                                        name='subject'
+                                        className='auth_input'
+                                        placeholder={t("enterSubject")}
+                                        value={formData.subject}
+                                        onChange={handleInputChange}
+                                    />
+                                </div>
+                                <div className='auth_in_cont'>
+                                    <label htmlFor="message" className='auth_pers_label'>{t('message')}</label>
+                                    <textarea
+                                        placeholder={t("enterMessage")}
+                                        name="message"
+                                        id="message"
+                                        rows="5"
+                                        className='auth_input'
+                                        value={formData.message}
+                                        onChange={handleInputChange}
+                                    ></textarea>
+                                </div>
+                                <button type={IsLoading ? 'button' : 'submit'} className='sv_chng_btn'>{IsLoading ? 'Loading...' : t('submit')}</button>
+                            </form>
+                            <div className="contact_info">
+                                <h5 className="contact_info_head">{t('contactInfo')}</h5>
+                                <div className="contact_detail">
+                                    {settings?.company_address &&
+                                        <div className="contact_detail_item">
+                                            <div className="contact_info_icons">
+                                                <GrLocation size={24} />
+                                            </div>
+                                            <p className="contc_info">{settings?.company_address}</p>
+                                        </div>
+                                    }
+                                    {settings?.company_email &&
+                                        <div className="contact_detail_item">
+                                            <div className="contact_info_icons">
+                                                <RiMailSendLine size={24} />
+                                            </div>
+                                            <a href={`mailto:${settings?.company_email}`}>
+                                                <p className="contc_info">{settings?.company_email}</p>
+                                            </a>
+                                        </div>
+                                    }
+                                    {settings?.company_tel1 && settings?.company_tel2 &&
+                                        <div className="contact_detail_item">
+                                            <div className="contact_info_icons">
+                                                <TbPhoneCall size={24} />
+                                            </div>
+                                            <div className="conatct_no">
+                                                <a href={`tel:${settings?.company_tel1}`}>
+                                                    <p className="contc_info">{settings?.company_tel1}</p>
+                                                </a>
+                                                <a href={`tel:${settings?.company_tel2}`}>
+                                                    <p className="contc_info">{settings?.company_tel2}</p>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                                <div className="contact_socialmedia_icons_cont">
+                                    <h5 className="contact_info_head">{t('socialMedia')}</h5>
+                                    <div className="contact_socialmedia_icons">
+                                        {settings?.facebook_link &&
+                                            <a href={settings?.facebook_link}>
+                                                <div className="social_media_items">
+                                                    <FaFacebook size={24} />
+                                                </div>
+                                            </a>
+                                        }
+                                        {settings?.instagram_link &&
+                                            <a href={settings?.instagram_link}>
+                                                <div className="social_media_items">
+                                                    <FaInstagram size={22} />
+                                                </div>
+                                            </a>
+                                        }
+                                        {settings?.x_link &&
+                                            <a href={settings?.x_link}>
+                                                <div className="social_media_items">
+                                                    <FaSquareXTwitter size={22} />
+                                                </div>
+                                            </a>
+                                        }
+                                        {settings?.linkedin_link &&
+                                            <a href={settings?.linkedin_link}>
+                                                <div className="social_media_items">
+                                                    <FaLinkedin size={24} />
+                                                </div>
+                                            </a>
+                                        }
+                                        {settings?.pinterest_link &&
+                                            <a href={settings?.pinterest_link}>
+                                                <div className="social_media_items">
+                                                    <FaPinterest size={24} />
+                                                </div>
+                                            </a>
+                                        }
 
-            <div className="mb-4">
-              <h5 className="fw-semibold">Legal & Privacy</h5>
-              <p>GDPR requests, copyright issues, legal matters</p>
-              <div className="d-flex flex-wrap gap-3">
-                <a href="mailto:legal@vidaki.com" className="text-primary">
-                  legal@vidaki.com
-                </a>
-                <a href="mailto:privacy@vidaki.com" className="text-primary">
-                  privacy@vidaki.com
-                </a>
-              </div>
-              <span className="badge bg-success-subtle text-success fw-semibold mt-2">
-                Response: 2–5 business days
-              </span>
-            </div>
+                                    </div>
+                                </div>
+                                {settings?.google_map_iframe_link &&
+                                    <iframe
+                                        src={settings?.google_map_iframe_link}
+                                        loading="lazy"
+                                        className='contact_loc_map'
+                                    ></iframe>
+                                }
+                            </div>
+                        </div>
 
-            <div className="mb-4">
-              <h5 className="fw-semibold">Business Inquiries</h5>
-              <p>Partnerships, advertising, media</p>
-              <a href="mailto:business@vidaki.com" className="text-primary">
-                business@vidaki.com
-              </a>
-              <div className="mt-2">
-                <span className="badge bg-success-subtle text-success fw-semibold">
-                  Response: 2–5 business days
-                </span>
-              </div>
-            </div>
-
-            <div>
-              <h5 className="fw-semibold ">Office Address</h5>
-              <address>
-                Vidaki Online Services OÜ
-                <br />
-                [Insert Address], [City, Postal Code], Estonia
-              </address>
-              <small className="text-muted">
-                For fastest service, please email us.
-              </small>
-            </div>
-          </div>
-
-          {/* Right Form */}
-          <div className="col-lg-6">
-            <div className="card shadow-sm border-0">
-              <div className="card-body p-4 bg-app-primary text-white rounded-3">
-                <h4 className="fw-semibold mb-4">{t("sendMessage")}</h4>
-                <form onSubmit={handleSubmit}>
-                  {["name", "email", "subject"].map((field) => (
-                    <div key={field} className="mb-3">
-                      <label className="form-label text-white text-capitalize">
-                        {t(field)}
-                      </label>
-                      <input
-                        type={field === "email" ? "email" : "text"}
-                        name={field}
-                        className="form-control"
-                        placeholder={t(
-                          `enter${
-                            field.charAt(0).toUpperCase() + field.slice(1)
-                          }`
-                        )}
-                        value={formData[field]}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                  ))}
-                  <div className="mb-3">
-                    <label className="form-label text-white">
-                      {t("message")}
-                    </label>
-                    <textarea
-                      name="message"
-                      className="form-control"
-                      rows="5"
-                      placeholder={t("enterMessage")}
-                      value={formData.message}
-                      onChange={handleInputChange}
-                      required
-                    ></textarea>
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={IsLoading}
-                    className="secondary__btn"
-                  >
-                    {IsLoading ? "Loading..." : t("submit")}
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Language Section */}
-        <div className="text-center my-5">
-          <h2 className="fw-bold hero-font-color mb-3">Multilingual Support</h2>
-          <p className="lead text-muted">
-            We support all official languages across our 38 operating countries.
-            Please indicate your preferred language in your email subject line.
-          </p>
-        </div>
-
-        <div className="row">
-          <div className="col-md-6 mb-4">
-            <div className="card border-0 shadow-sm h-100">
-              <div className="card-header bg-light">
-                <h5 className="mb-0 text-dark">European Languages</h5>
-              </div>
-              <div className="card-body">
-                <p className="card-text">
-                  Albanian, Belarusian, Bosnian, Bulgarian, Croatian, Czech,
-                  Danish, Estonian, Finnish, German, Greek, Hungarian,
-                  Icelandic, Latvian, Lithuanian, Macedonian, Montenegrin,
-                  Polish, Romanian, Russian, Serbian, Slovak, Slovenian,
-                  Swedish, Turkish, Ukrainian
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="col-md-6 mb-4">
-            <div className="card border-0 shadow-sm h-100">
-              <div className="card-header bg-light">
-                <h5 className="mb-0 text-dark">Central Asian Languages</h5>
-              </div>
-              <div className="card-body">
-                <p className="card-text">
-                  Dari, Kazakh, Kyrgyz, Mongolian, Pashto, Tajik, Turkmen, Uzbek
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-           
-        <div className="row justify-content-center">
-            <div className="col-lg-12">
-                <div className="card border-0 shadow bg-transparent">
-                    <div className="card-body p-4">
-                        <h4 className="card-title fw-bold text-danger">⚠️ Emergency Situations</h4>
-                        
-                        <h6 className="card-text fw-bold">If you're experiencing immediate danger or criminal activity:</h6>
-                        
-                        <ol className="list-group list-group-numbered border-0">
-                            <li className="list-group-item d-flex align-items-start border-0 bg-transparent">
-                              
-                                <span>Contact local police or emergency services immediately</span>
-                            </li>
-                            <li className="list-group-item d-flex align-items-start border-0 bg-transparent">
-                                
-                                <span>Then report the incident to us at safety@vidaki.com</span>
-                            </li>
-                        </ol>
                     </div>
                 </div>
             </div>
-        </div>
-    
-
-        {/* FAQ */}
-        <div className="mt-5">
-          <h2 className="fw-bold text-center hero-font-color mb-4">
-            Quick Answers
-          </h2>
-          {faqIsLoading ? (
-            <div className="text-center py-4">Loading...</div>
-          ) : Faq?.length > 0 ? (
-            <QuickAnswerAccordion Faq={Faq} />
-          ) : (
-            <NoData name={t("faqs")} />
-          )}
-        </div>
-      </div>
-    </div>
-  );
+        </>
+    )
 }
+
+export default ContactUs

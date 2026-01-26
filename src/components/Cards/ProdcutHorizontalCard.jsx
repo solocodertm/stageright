@@ -88,7 +88,16 @@ const ProdcutHorizontalCard = ({ data, handleLike }) => {
                         </span>
                         {/* <span className='decs'>{data?.description}</span> */}
                         <p className="product_card_prod_det">
-                            {data?.city}{data?.city ? "," : null}{data?.state}{data?.state ? "," : null}{data?.country}
+                            {(() => {
+                                const locationParts = [];
+                                if (data?.city) locationParts.push(data.city);
+                                // Only add state if it's different from city
+                                if (data?.state && data.state !== data?.city) {
+                                    locationParts.push(data.state);
+                                }
+                                if (data?.country) locationParts.push(data.country);
+                                return locationParts.join(", ");
+                            })()}
                         </p>
                     </div>
                     <div className="post_time">

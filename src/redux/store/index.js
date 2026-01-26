@@ -14,6 +14,7 @@ import offerReducer from '../reuducer/offerSlice';
 import searchReducer from "../reuducer/searchSlice"
 import globalStateReducer from '../reuducer/globalStateSlice';
 import filterReducer from '../reuducer/filterSlice'
+import countryReducer from '../reuducer/countrySlice'
 
 // Create noop storage for server-side rendering
 const createNoopStorage = () => {
@@ -54,7 +55,8 @@ const rootReducer = combineReducers({
   OfferData: offerReducer,
   Search: searchReducer,
   GlobalState: globalStateReducer,
-  Filter: filterReducer
+  Filter: filterReducer,
+  CurrentCountry: countryReducer
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

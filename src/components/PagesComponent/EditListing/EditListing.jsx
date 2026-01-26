@@ -14,12 +14,10 @@ import axios from 'axios'
 import { getMyItemsApi } from "@/utils/api";
 import { settingsData } from '@/redux/reuducer/settingSlice'
 import { CurrentLanguageData } from '@/redux/reuducer/languageSlice'
-import { CurrentCurrencyData } from '@/redux/reuducer/currencySlice'
 
 
 const EditListing = ({ id }) => {
 
-    const CurrentCurrency = useSelector(CurrentCurrencyData)
     const CurrentLanguage = useSelector(CurrentLanguageData)
     const systemSettingsData = useSelector(settingsData)
     const settings = systemSettingsData?.data
@@ -607,7 +605,6 @@ const EditListing = ({ id }) => {
             slug: AdListingDetails.slug.trim(),
             description: AdListingDetails?.desc,
             price: AdListingDetails.price,
-            currency_code: CurrentCurrency.code,
             contact: AdListingDetails.phonenumber,
             video_link: AdListingDetails?.link,
             custom_fields: transformedCustomFields,
@@ -797,7 +794,7 @@ const EditListing = ({ id }) => {
 
                                 {
                                     activeTab === 2 &&
-                                    <EditListingTwo AdListingDetails={AdListingDetails} handleAdListingChange={handleAdListingChange} handleDetailsSubmit={handleDetailsSubmit} handleGoBack={handleGoBack} systemSettingsData={systemSettingsData} currentCurrency={CurrentCurrency} />
+                                    <EditListingTwo AdListingDetails={AdListingDetails} handleAdListingChange={handleAdListingChange} handleDetailsSubmit={handleDetailsSubmit} handleGoBack={handleGoBack} systemSettingsData={systemSettingsData} />
                                 }
 
                                 {

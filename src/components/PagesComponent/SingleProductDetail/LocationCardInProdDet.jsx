@@ -8,7 +8,14 @@ const LocationCardInProdDet = ({ productData }) => {
 
 
     const handleShowMapClick = () => {
-        const locationQuery = `${productData?.city}, ${productData?.state}, ${productData?.country}`;
+        const locationParts = [];
+        if (productData?.city) locationParts.push(productData.city);
+        // Only add state if it's different from city
+        if (productData?.state && productData.state !== productData?.city) {
+            locationParts.push(productData.state);
+        }
+        if (productData?.country) locationParts.push(productData.country);
+        const locationQuery = locationParts.join(", ");
         const googleMapsUrl = `https://www.google.com/maps?q=${locationQuery}&ll=${productData?.latitude},${productData?.longitude}&z=12&t=m`;
         window.open(googleMapsUrl, '_blank');
     };
@@ -23,7 +30,16 @@ const LocationCardInProdDet = ({ productData }) => {
                 <div className="location">
                     <span><IoLocationOutline size={24} /></span>
                     <span>
-                        {productData?.city}{productData?.city ? "," : null} {productData?.state}{productData?.state ? "," : null} {productData?.country}
+                        {(() => {
+                            const locationParts = [];
+                            if (productData?.city) locationParts.push(productData.city);
+                            // Only add state if it's different from city
+                            if (productData?.state && productData.state !== productData?.city) {
+                                locationParts.push(productData.state);
+                            }
+                            if (productData?.country) locationParts.push(productData.country);
+                            return locationParts.join(", ");
+                        })()}
                     </span>
                 </div>
                 <div className="location_details_map">

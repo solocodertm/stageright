@@ -627,12 +627,15 @@ export const logout = () => {
 
 
 // Load Google Maps
+// Static libraries array to prevent LoadScript reload warning
+const GOOGLE_MAPS_LIBRARIES = ['geometry', 'drawing', 'places'];
+
 export const loadGoogleMaps = () => {
   let settings = store.getState()?.Settings?.data?.data
   return useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: settings?.place_api_key,
-    libraries: ['geometry', 'drawing', 'places'], // Include 'places' library
+    libraries: GOOGLE_MAPS_LIBRARIES, // Use static array to prevent reload warning
   });
 };
 
@@ -861,29 +864,3 @@ export function getRoundedRating(rating) {
 export function convertPrice(usdPrice, rate) {
   return (usdPrice * rate).toFixed(2)
 }
-
-export const getCountryLatLng = async (countryName) => {
-  return new Promise((resolve, reject) => {
-    const geocoder = new window.google.maps.Geocoder();
-
-    geocoder.geocode({ address: countryName }, (results, status) => {
-      if (status === "OK" && results[0]) {
-        const result = results[0];
-
-        const countryCode = result.address_components.find(c =>
-          c.types.includes("country")
-        )?.short_name;
-
-        resolve({
-          city: result.formatted_address,
-          country: countryName,
-          countryCode,
-          lat: result.geometry.location.lat(),
-          long: result.geometry.location.lng(),
-        });
-      } else {
-        reject("Geocoder failed: " + status);
-      }
-    });
-  });
-};

@@ -5,8 +5,7 @@ import { IoIosAddCircleOutline } from "react-icons/io";
 import { GiHamburgerMenu } from "react-icons/gi";
 import dynamic from 'next/dynamic';
 import { Drawer, Select, Spin } from 'antd'
-import { MdLocationPin } from "react-icons/md";
-import LocationIcon from "../../../public/assets/location-28.svg"
+import { GrLocation } from "react-icons/gr";
 import { FaSearch } from 'react-icons/fa';
 import Link from 'next/link';
 import 'swiper/css';
@@ -36,8 +35,8 @@ import HeaderCategories from './HeaderCategories';
 import CurrencyDropdown from '../HeaderDropdowns/CurrencyDropdown';
 import { CurrentCurrencyData, setCurrentCurrency } from '@/redux/reuducer/currencySlice';
 import SubHeader from './SubHeader';
+import { DEFAULT_COUNTRY, getCountryByCode } from '@/config/countries';
 import UserDropdown from '../HeaderDropdowns/UserDropdown';
-import AdListingDropdown from '../HeaderDropdowns/AdListingDropdown';
 const ProfileDropdown = dynamic(() => import('../Profile/ProfileDropdown.jsx'))
 const MailSentSucessfully = dynamic(() => import('../Auth/MailSentSucessfully.jsx'), { ssr: false })
 const LoginModal = dynamic(() => import('../Auth/LoginModal.jsx'), { ssr: false })
@@ -141,44 +140,65 @@ const Header = () => {
 
     const getLanguageData = async (language_code) => {
         try {
-            const res = await getLanguageApi.getLanguage({ language_code, type: 'web' });
-            if (res?.data?.error === true) {
-                toast.error(res?.data?.message)
-            }
-            else {
+            // Import translation utilities
+            const { loadLanguageTranslations } = await import('@/utils/translations');
+            const { saveLanguageToCookie } = await import('@/utils/cookies');
+            
+            // Load translations (prioritizes static JSON, falls back to API)
+            const languageData = await loadLanguageTranslations(language_code, getLanguageApi);
+            
+            if (languageData) {
+                // Save to cookie AND localStorage (via Redux)
+                saveLanguageToCookie(language_code);
+                
                 if (show) {
                     setShow(false)
                 }
-                dispatch(setCurrentLanguage(res?.data?.data));
+                
+                // Update Redux state (which persists to localStorage)
+                dispatch(setCurrentLanguage(languageData));
+            } else {
+                toast.error('Failed to load language translations');
             }
         } catch (error) {
-            console.log(error);
+            console.error('Error loading language:', error);
+            toast.error('Failed to change language');
         }
     }
 
     const setDefaultCurrency = async () => {
         try {
-            const currency_code = settings?.currencies.find((currency) => currency.code == "USD");
-            if(currency_code){
-                dispatch(setCurrentCurrency(currency_code));
+            // Use default country from config (currently Barbados) to derive default currency
+            const defaultCountry = getCountryByCode(DEFAULT_COUNTRY);
+            if (defaultCountry && settings?.currencies) {
+                const matchingCurrency = settings.currencies.find(
+                    (currency) => currency.code?.toUpperCase() === defaultCountry.currency?.toUpperCase()
+                );
+                if (matchingCurrency) {
+                    dispatch(setCurrentCurrency(matchingCurrency));
+                }
             }
-            
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
     const setDefaultLanguage = async () => {
         try {
-            const language_code = settings?.default_language
-            const res = await getLanguageApi.getLanguage({ language_code, type: 'web' });
-            if (res?.data?.error === true) {
-                toast.error(res?.data?.message)
-            }
-            else {
-                dispatch(setCurrentLanguage(res?.data?.data));
+            // Check cookie first, then settings default
+            const { getLanguageFromCookie } = await import('@/utils/cookies');
+            const { loadLanguageTranslations } = await import('@/utils/translations');
+            
+            const cookieLanguage = getLanguageFromCookie();
+            const language_code = cookieLanguage || settings?.default_language || 'en';
+            
+            // Load translations (prioritizes static JSON, falls back to API)
+            const languageData = await loadLanguageTranslations(language_code, getLanguageApi);
+            
+            if (languageData) {
+                dispatch(setCurrentLanguage(languageData));
             }
         } catch (error) {
-            console.log(error)
+            console.error('Error setting default language:', error);
         }
     }
 
@@ -371,7 +391,7 @@ const Header = () => {
                     <div className="left_side">
                         <div className="nav_logo">
                             <Link href="/">
-                                <Image src='/public/assets/logo.svg' alt='logo' width={0} height={0} className="header_logo_2" onErrorCapture={placeholderImage} />
+                                <Image src='/public/assets/logo.svg' alt='logo' width={0} height={0} class="header_logo_2" onErrorCapture={placeholderImage} />
                             </Link>
                         </div>
 
@@ -446,45 +466,75 @@ const Header = () => {
 
                     {(cityData?.city || cityData?.state || cityData?.country) ? (
                         <div className='home_header_location' onClick={openLocationEditModal}>
-                            <img loading="lazy" height={25} width={25} src={LocationIcon.src} alt="location" />
-                            <p className='header_location' title={[cityData?.city, cityData?.state, cityData?.country].filter(Boolean).join(", ")}>
+                            <GrLocation size={16} />
+                            <p className='header_location' title={(() => {
+                                const locationParts = [];
+                                if (cityData?.city) locationParts.push(cityData.city);
+                                // Only add state if it's different from city
+                                if (cityData?.state && cityData.state !== cityData?.city) {
+                                    locationParts.push(cityData.state);
+                                }
+                                if (cityData?.country) locationParts.push(cityData.country);
+                                return locationParts.join(", ");
+                            })()}>
                                 {
-                                    truncate(
-                                        [cityData?.city, cityData?.state, cityData?.country]
-                                            .filter(Boolean)
-                                            .join(", "),
-                                        12
-                                    )
+                                    truncate((() => {
+                                        const locationParts = [];
+                                        if (cityData?.city) locationParts.push(cityData.city);
+                                        // Only add state if it's different from city
+                                        if (cityData?.state && cityData.state !== cityData?.city) {
+                                            locationParts.push(cityData.state);
+                                        }
+                                        if (cityData?.country) locationParts.push(cityData.country);
+                                        return locationParts.join(", ");
+                                    })(), 12)
                                 }
                             </p>
                         </div>
                     ) : (
                         <div className='home_header_location' onClick={openLocationEditModal}>
-                            <MdLocationPin className="text-danger"  size={18} />
+                            <GrLocation size={16} />
                             <p className='header_location'>{t('addLocation')}</p>
                         </div>
                     )}
                     <div className="right_side">
                         {!isLogin() ? (
                             <>
-                              
-                                 <div className='nav-item nav-link' >
-                                    
+                                <div class="verf_email_add_btn rounded-pill d-flex align-items-center" onClick={openLoginModal} >
+                                    {/* {t('login')} */}
+                                    <span className="px-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-plus me-1" viewBox="0 0 16 16">
+                                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                        </svg>
+                                    </span>
+                                    {/* <span class="px-2 d-none d-lg-inline-block">
+                                        {t('new')}
+                                    </span> */}
+                                </div>
+                                {/* <span className='vl'></span> */}
+                                <div className='nav-item nav-link' >
+                                    {/* {t('register')} */}
                                     <UserDropdown
                                         onLogin={openLoginModal}
                                         onRegister={openRegisterModal}
                                         />
                                 </div>
                             </>
-                        ) : null}
+                        ) : (
+                            <ProfileDropdown closeDrawer={closeDrawer} settings={settings} handleLogout={handleLogout} isDrawer={false} />
+                        )}
 
                            {isLogin() && 
-                                <ProfileDropdown 
-                                    closeDrawer={closeDrawer}
-                                    settings={settings}
-                                    handleLogout={handleLogout}
-                                    isDrawer={false} 
-                                />
+                            <div className="item_add">
+                                <button className='ad_listing' disabled={isAdListingClicked} onClick={handleCheckLogin}>
+                                    <IoIosAddCircleOutline size={18} className='ad_listing_icon' />
+                                    <span className='adlist_btn' title={t('adListing')}>
+                                        {
+                                            truncate(t('adListing'), 12)
+                                        }
+                                    </span>
+                                </button>
+                            </div>
                            }
     
                         <CurrencyDropdown settings={settings} />
@@ -504,12 +554,19 @@ const Header = () => {
                 <ul className="mobile_nav">
                     {cityData &&
                         <li className='mob_header_location' onClick={openLocationEditModal}>
-                            <img loading="lazy" height={25} width={25} src={LocationIcon.src} alt="location" />
+                            <GrLocation size={16} />
                             <p>
                                 {
-                                    [cityData?.city, cityData?.state, cityData?.country]
-                                        .filter(Boolean)
-                                        .join(", ")
+                                    (() => {
+                                        const locationParts = [];
+                                        if (cityData?.city) locationParts.push(cityData.city);
+                                        // Only add state if it's different from city
+                                        if (cityData?.state && cityData.state !== cityData?.city) {
+                                            locationParts.push(cityData.state);
+                                        }
+                                        if (cityData?.country) locationParts.push(cityData.country);
+                                        return locationParts.join(", ");
+                                    })()
                                 }
                             </p>
                         </li>
