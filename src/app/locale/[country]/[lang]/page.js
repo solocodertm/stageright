@@ -62,12 +62,14 @@ const fetchFeaturedSections = async () => {
 };
 
 const Page = async ({ params }) => {
-  const {lang ,country} = await params
+  const {lang ,country} = params;
   const localeLang = meta[lang] ? lang : "en";
-  const categoriesData = await fetchCategories();
-  const productItemsData = await fetchProductItems();
-  const featuredSectionsData = await fetchFeaturedSections();
-
+ const [categoriesData, productItemsData, featuredSectionsData] =
+  await Promise.all([
+    fetchCategories(),
+    fetchProductItems(),
+    fetchFeaturedSections(),
+  ]);
   const existingSlugs = new Set(productItemsData.map(product => product.slug));
 
   let featuredItems = [];
