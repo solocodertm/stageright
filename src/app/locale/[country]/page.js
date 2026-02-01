@@ -3,11 +3,11 @@ import Layout from '@/components/Layout/Layout';
 import axios from 'axios';
 import meta from "@/utils/locale/meta/getMeta.json";
 
-export async function generateMetadata({ params }) {
+export async function generateMetadata({ params,searchParams }) {
   const { country } = params;
-
+  const { lang } = searchParams;
   // Fallback to English if the country code does not exist
-  const locale = meta[country] ? country : "en";
+  const locale = meta[lang] ? lang : "en";
 
   const m = meta[locale];
 
@@ -19,7 +19,7 @@ export async function generateMetadata({ params }) {
       title: m.title,
       description: m.description,
       keywords: m.keywords,
-      url: `${process.env.NEXT_PUBLIC_WEB_URL}/${country}`,
+      url: `${process.env.NEXT_PUBLIC_WEB_URL}/locale/${country}`,
     }
   };
 }
