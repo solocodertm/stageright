@@ -178,7 +178,7 @@ const addLanguageUrls = () => {
     .map(
       (lang) => `
   <url>
-    <loc>${process.env.NEXT_PUBLIC_WEB_URL}/locale/${lang?.name?.toLocaleLowerCase()}?lang=${lang?.code}</loc>
+    <loc>${process.env.NEXT_PUBLIC_WEB_URL}/locale/${lang?.code}?lang=${lang?.code}</loc>
     <lastmod>${new Date().toISOString()}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>

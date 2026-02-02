@@ -5,20 +5,21 @@ import { placeholderImage } from '@/utils';
 import { IoMdArrowDropdown } from "react-icons/io";
 import { CurrentLanguageData } from '@/redux/reuducer/languageSlice';
 import { useSelector } from 'react-redux';
-import { useRouter } from 'next/navigation';
+import { useRouter,usePathname } from 'next/navigation';
 
 const LanguageDropdown = ({ getLanguageData, settings }) => {
 
     const CurrentLanguage = useSelector(CurrentLanguageData)
     const languages = settings && settings?.languages
     const router = useRouter();
+    const pathname = usePathname();
     const handleLanguageSelect = (prop) => {
         const lang = languages?.find(item => item.id === Number(prop.key))
         if (CurrentLanguage.id === lang.id) {
             return
         }
         getLanguageData(lang?.code)
-        router.push(`/locale/${lang?.name.toLowerCase()}?lang=${lang?.code}`);
+        router.push(`${pathname}?lang=${lang?.code}`);
     };
     const items = languages && languages.map(lang => ({
         label: (
