@@ -12,7 +12,7 @@ import HomeAllItem from './HomeAllItem'
 import { getKilometerRange, saveCity } from '@/redux/reuducer/locationSlice'
 import { useParams, useRouter,usePathname  } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { getCountryLatLng } from '@/utils'
+import { DEFAULT_LANGUAGE_CODE, getCountryLatLng } from '@/utils'
 
 const HomePage = () => {
     const dispatch = useDispatch()
@@ -78,7 +78,7 @@ const HomePage = () => {
                 "PK" : "ps",
                 "SI" : "sk"
             }
-            const getAppropriateLanguageCode = languageCodeMapping[countryCode] || 'en';
+            const getAppropriateLanguageCode = languageCodeMapping[countryCode] || DEFAULT_LANGUAGE_CODE;
             availableLanguage = settings?.languages?.find((l) => l.code === getAppropriateLanguageCode);
           }
           if(availableLanguage){

@@ -887,3 +887,5 @@ export const getCountryLatLng = async (countryName) => {
     });
   });
 };
+
+export const DEFAULT_LANGUAGE_CODE = 'et'; // estonia

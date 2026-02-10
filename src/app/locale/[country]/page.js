@@ -2,12 +2,13 @@ import HomePage from '@/components/Home';
 import Layout from '@/components/Layout/Layout';
 import axios from 'axios';
 import meta from "@/utils/locale/meta/getMeta.json";
+import { DEFAULT_LANGUAGE_CODE } from '@/utils';
 
 export async function generateMetadata({ params,searchParams }) {
   const { country } = params;
   const { lang } = searchParams;
   // Fallback to English if the country code does not exist
-  const locale = meta[lang] ? lang : "en";
+  const locale = meta[lang] ? lang : DEFAULT_LANGUAGE_CODE;
 
   const m = meta[locale];
 

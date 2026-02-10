@@ -3,12 +3,13 @@ import Layout from '@/components/Layout/Layout';
 import axios from 'axios';
 import meta from "@/utils/locale/meta/getMeta.json";
 import SettingsSetter from '@/components/Home/SettingsSetter';
+import { DEFAULT_LANGUAGE_CODE } from '@/utils';
 
 export async function generateMetadata({ params }) {
   const { lang, country } = params;
 
   // Fallback to English if the country code does not exist
-  const locale = meta[lang] ? lang : "en";
+  const locale = meta[lang] ? lang : DEFAULT_LANGUAGE_CODE;
 
   const m = meta[locale];
 
@@ -63,7 +64,7 @@ const fetchFeaturedSections = async () => {
 
 const Page = async ({ params }) => {
   const {lang ,country} = params;
-  const localeLang = meta[lang] ? lang : "en";
+  const localeLang = meta[lang] ? lang : DEFAULT_LANGUAGE_CODE;
  const [categoriesData, productItemsData, featuredSectionsData] =
   await Promise.all([
     fetchCategories(),
